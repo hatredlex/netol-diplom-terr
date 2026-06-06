@@ -19,3 +19,13 @@ output "storage_secret_key" {
 output "service_account_key_file" {
   value = local_sensitive_file.terraform_sa_key_file.filename
 }
+
+## Stage 2 Kuber Cluster
+
+output "k8s_cluster_service_account_id" {
+  value = yandex_iam_service_account.k8s_cluster.id
+}
+
+output "k8s_nodes_service_account_id" {
+  value = yandex_iam_service_account.k8s_nodes.id
+}

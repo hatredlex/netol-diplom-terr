@@ -87,3 +87,53 @@ resource "yandex_storage_bucket_grant" "tf_state_private" {
     permissions = ["FULL_CONTROL"]
   }
 }
+
+## Stage 2 Kuber Cluster
+
+# Service account для Managed Kubernetes cluster.
+resource "yandex_iam_service_account" "k8s_cluster" {
+  name        = "k8s-cluster-sa"
+  description = "Service account for Yandex Managed Kubernetes cluster"
+  folder_id   = var.folder_id
+}
+
+# Service account для worker nodes.
+resource "yandex_iam_service_account" "k8s_nodes" {
+  name        = "k8s-nodes-sa"
+  description = "Service account for Yandex Managed Kubernetes nodes"
+  folder_id   = var.folder_id
+}
+
+# Роль для управления ресурсами Managed Kubernetes cluster.
+resource "yandex_resourcemanager_folder_iam_member" "k8s_clusters_agent" {
+  folder_id = var.folder_id
+  role      = "k8s.clusters.agent"
+  member    = "serviceAccount:${yandex_iam_service_account.k8s_cluster.id}"
+}
+
+resource "yandex_resourcemanager_folder_iam_member" "k8s_tunnel_clusters_agent" {
+  folder_id = var.folder_id
+  role      = "k8s.tunnelClusters.agent"
+  member    = "serviceAccount:${yandex_iam_service_account.k8s_cluster.id}"
+}
+
+# Роль для создания публичных сетевых ресурсов.
+resource "yandex_resourcemanager_folder_iam_member" "k8s_vpc_public_admin" {
+  folder_id = var.folder_id
+  role      = "vpc.publicAdmin"
+  member    = "serviceAccount:${yandex_iam_service_account.k8s_cluster.id}"
+}
+
+# Роль для создания Network Load Balancer из Kubernetes Service.
+resource "yandex_resourcemanager_folder_iam_member" "k8s_load_balancer_admin" {
+  folder_id = var.folder_id
+  role      = "load-balancer.admin"
+  member    = "serviceAccount:${yandex_iam_service_account.k8s_cluster.id}"
+}
+
+# Роль для скачивания образов из Yandex Container Registry.
+resource "yandex_resourcemanager_folder_iam_member" "k8s_nodes_images_puller" {
+  folder_id = var.folder_id
+  role      = "container-registry.images.puller"
+  member    = "serviceAccount:${yandex_iam_service_account.k8s_nodes.id}"
+}
