@@ -39,3 +39,17 @@ output "k8s_external_endpoint" {
 output "k8s_node_group_id" {
   value = yandex_kubernetes_node_group.diplom.id
 }
+
+## Stage 3 Container Registry
+
+output "container_registry_id" {
+  value = yandex_container_registry.diplom.id
+}
+
+output "container_registry_name" {
+  value = yandex_container_registry.diplom.name
+}
+
+output "diplom_nginx_repository_name" {
+  value = yandex_container_repository.diplom_nginx.name
+}

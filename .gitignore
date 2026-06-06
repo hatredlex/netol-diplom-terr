@@ -3,5 +3,7 @@
 .terraform/
 .terraform.lock.hcl
 bootstrap/terraform-sa-key.json
+bootstrap/app-pusher-key.json
+*key*.json
 infra/backend.hcl
 *.tfvars

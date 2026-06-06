@@ -137,3 +137,38 @@ resource "yandex_resourcemanager_folder_iam_member" "k8s_nodes_images_puller" {
   role      = "container-registry.images.puller"
   member    = "serviceAccount:${yandex_iam_service_account.k8s_nodes.id}"
 }
+
+## Stage 3 Container Registry
+
+# SA для сборки и публикации Docker image в Container Registry.
+resource "yandex_iam_service_account" "app_pusher" {
+  name        = "app-pusher-sa"
+  description = "Service account for pushing Docker images to Yandex Container Registry"
+  folder_id   = var.folder_id
+}
+
+resource "yandex_resourcemanager_folder_iam_member" "app_pusher_images_pusher" {
+  folder_id = var.folder_id
+  role      = "container-registry.images.pusher"
+  member    = "serviceAccount:${yandex_iam_service_account.app_pusher.id}"
+}
+
+resource "yandex_iam_service_account_key" "app_pusher_key" {
+  service_account_id = yandex_iam_service_account.app_pusher.id
+  description        = "Authorized key for Docker image push"
+  key_algorithm      = "RSA_2048"
+}
+
+resource "local_sensitive_file" "app_pusher_key_file" {
+  filename        = "${path.module}/app-pusher-key.json"
+  file_permission = "0600"
+
+  content = jsonencode({
+    id                 = yandex_iam_service_account_key.app_pusher_key.id
+    service_account_id = yandex_iam_service_account.app_pusher.id
+    created_at         = yandex_iam_service_account_key.app_pusher_key.created_at
+    key_algorithm      = yandex_iam_service_account_key.app_pusher_key.key_algorithm
+    public_key         = yandex_iam_service_account_key.app_pusher_key.public_key
+    private_key        = yandex_iam_service_account_key.app_pusher_key.private_key
+  })
+}

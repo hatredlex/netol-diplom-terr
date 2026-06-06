@@ -29,3 +29,13 @@ output "k8s_cluster_service_account_id" {
 output "k8s_nodes_service_account_id" {
   value = yandex_iam_service_account.k8s_nodes.id
 }
+
+## Stage 3 Container Registry
+
+output "app_pusher_service_account_id" {
+  value = yandex_iam_service_account.app_pusher.id
+}
+
+output "app_pusher_key_file" {
+  value = local_sensitive_file.app_pusher_key_file.filename
+}
