@@ -88,6 +88,7 @@ resource "yandex_kubernetes_node_group" "diplom" {
 
   labels = {
     project = "netology-diplom"
+    check   = "atlantis"
   }
 
   depends_on = [
