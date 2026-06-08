@@ -90,6 +90,7 @@ resource "yandex_kubernetes_node_group" "diplom" {
     project = "netology-diplom"
     check   = "atlantis"
   }
+# Atlantis test
 
   depends_on = [
     yandex_kubernetes_cluster.diplom,
